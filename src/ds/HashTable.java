@@ -1,185 +1,137 @@
 package ds;
 
 import adt.Dictionary;
-import adt.List;
 import exception.WrongIndexException;
-
-import java.security.Key;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.function.Consumer;
 
-public class HashTable<K,V> implements Dictionary {
-    private static class TableEntry<K, V>{
+public class HashTable<K, V> implements Dictionary<K, V> {
+    private static class TableEntry<K, V> {
         K clave;
         V valor;
+
         TableEntry(K clave, V valor) {
-            this.clave = clave; this.valor = valor;
+            this.clave = clave;
+            this.valor = valor;
         }
+
+        @Override
         public boolean equals(Object obj) {
-            if (obj instanceof TableEntry<?,?> == false) return false;
-            TableEntry<K,V> ent = (TableEntry<K,V>)obj;
-            return ent.clave.equals(clave);
+            if (!(obj instanceof TableEntry<?, ?>)) return false;
+            TableEntry<K, V> ent = (TableEntry<K, V>) obj;
+            return clave.equals(ent.clave);
+        }
+
+        public V getValor() {
+            return valor;
         }
     }
-    private List<TableEntry<K,V>>[] tabla = null;
+
+    private lista<TableEntry<K, V>>[] tabla;
+    private int size = 0;
+
+    @SuppressWarnings("unchecked")
     public HashTable(int m) throws WrongIndexException {
-        tabla = new List[m];
-        for (int i = 0; i < m; i++) tabla[i] = new lista(new TableEntry<K,V>(null,null)); {
-        };
+        tabla = new lista[m];
+        for (int i = 0; i < m; i++) {
+            tabla[i] = new lista<>();
+        }
     }
 
-    private class Citerator<K> implements Iterator<K>{
+    private int hash(K clave) {
+        return Math.abs(clave.hashCode() % tabla.length);
+    }
 
-        /**
-         * Returns {@code true} if the iteration has more elements.
-         * (In other words, returns {@code true} if {@link #next} would
-         * return an element rather than throwing an exception.)
-         *
-         * @return {@code true} if the iteration has more elements
-         */
+    @Override
+    public V put(K key, V value) throws WrongIndexException {
+        lista<TableEntry<K, V>> lista = tabla[hash(key)];
+        int pos = lista.search(new TableEntry<>(key, null));
+
+        if (pos != -1) {
+            // Si la clave ya existe, actualizar su valor
+          Node x = (Node) lista.get(pos);
+            TableEntry Y= (TableEntry) x.getDato();
+            Y.valor=value;
+        } else {
+            // Insertar nueva entrada en la lista
+            lista.insert(0, new TableEntry<>(key, value));
+            size++;
+        }
+        return value;
+    }
+
+    @Override
+    public V get(K key) throws WrongIndexException {
+        lista<TableEntry<K, V>> lista = tabla[hash(key)];
+        int pos = lista.search(new TableEntry<>(key, null));
+
+        if (pos != -1) {
+            Node x = (Node) lista.get(pos);
+            TableEntry y = (TableEntry) x.getDato();
+            return (V) y.getValor();
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public V remove(K key) throws WrongIndexException {
+        lista<TableEntry<K, V>> lista = tabla[hash(key)];
+        int pos = lista.search(new TableEntry<>(key, null));
+
+        if (pos != -1) {
+            lista.delete(pos);
+            size--;
+        }
+        return null;
+    }
+
+    @Override
+    public boolean contains(K key) throws WrongIndexException {
+        return get(key) != null;
+    }
+
+    @Override
+    public int size() {
+        return size;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return size == 0;
+    }
+
+    @Override
+    public void clear() throws WrongIndexException {
+        for (int i = 0; i < tabla.length; i++) {
+            tabla[i] = new lista<>();
+        }
+        size = 0;
+    }
+
+    @Override
+    public Iterator<K> iterator() {
+        return new HashTableIterator();
+    }
+
+    private class HashTableIterator implements Iterator<K> {
+        private int index = 0;
+        private Iterator<TableEntry<K, V>> currentListIterator = tabla[0].iterator();
+
         @Override
         public boolean hasNext() {
+            while (index < tabla.length) {
+                if (currentListIterator.hasNext()) return true;
+                index++;
+                if (index < tabla.length) {
+                    currentListIterator = tabla[index].iterator();
+                }
+            }
             return false;
         }
 
-        /**
-         * Returns the next element in the iteration.
-         *
-         * @return the next element in the iteration
-         * @throws NoSuchElementException if the iteration has no more elements
-         */
         @Override
         public K next() {
-            return null;
+            return hasNext() ? currentListIterator.next().clave : null;
         }
-
-        /**
-         * Removes from the underlying collection the last element returned
-         * by this iterator (optional operation).  This method can be called
-         * only once per call to {@link #next}.
-         * <p>
-         * The behavior of an iterator is unspecified if the underlying collection
-         * is modified while the iteration is in progress in any way other than by
-         * calling this method, unless an overriding class has specified a
-         * concurrent modification policy.
-         * <p>
-         * The behavior of an iterator is unspecified if this method is called
-         * after a call to the {@link #forEachRemaining forEachRemaining} method.
-         *
-         * @throws UnsupportedOperationException if the {@code remove}
-         *                                       operation is not supported by this iterator
-         * @throws IllegalStateException         if the {@code next} method has not
-         *                                       yet been called, or the {@code remove} method has already
-         *                                       been called after the last call to the {@code next}
-         *                                       method
-         * @implSpec The default implementation throws an instance of
-         * {@link UnsupportedOperationException} and performs no other action.
-         */
-        @Override
-        public void remove() {
-            Iterator.super.remove();
-        }
-
-        /**
-         * Performs the given action for each remaining element until all elements
-         * have been processed or the action throws an exception.  Actions are
-         * performed in the order of iteration, if that order is specified.
-         * Exceptions thrown by the action are relayed to the caller.
-         * <p>
-         * The behavior of an iterator is unspecified if the action modifies the
-         * collection in any way (even by calling the {@link #remove remove} method
-         * or other mutator methods of {@code Iterator} subtypes),
-         * unless an overriding class has specified a concurrent modification policy.
-         * <p>
-         * Subsequent behavior of an iterator is unspecified if the action throws an
-         * exception.
-         *
-         * @param action The action to be performed for each element
-         * @throws NullPointerException if the specified action is null
-         * @implSpec <p>The default implementation behaves as if:
-         * <pre>{@code
-         *     while (hasNext())
-         *         action.accept(next());
-         * }</pre>
-         * @since 1.8
-         */
-        @Override
-        public void forEachRemaining(Consumer<? super K> action) {
-            Iterator.super.forEachRemaining(action);
-        }
-    }
-
-    /**
-     * @param key
-     * @param value
-     * @return
-     */
-    @Override
-    public Object put(Object key, Object value) {
-
-
-    }
-
-    /**
-     * @param key
-     * @return
-     */
-    @Override
-    public Object get(Object key) {
-        return null;
-    }
-
-    /**
-     * @param key
-     * @return
-     */
-    @Override
-    public Object remove(Object key) {
-        return null;
-    }
-
-    /**
-     * @param key
-     * @return
-     */
-    @Override
-    public boolean contains(Object key) {
-        return false;
-    }
-
-    /**
-     * @return
-     */
-    @Override
-    public int size() {
-        return 0;
-    }
-
-    /**
-     * @return
-     */
-    @Override
-    public boolean isEmpty() {
-        return false;
-    }
-
-    /**
-     *
-     */
-    @Override
-    public void clear() {
-
-    }
-
-    /**
-     * @return
-     */
-    @Override
-    public Iterator iterator() {
-        return null;
-    }
-    private int hash(K clave) {
-        return clave.hashCode()%tabla.length;
     }
 }

@@ -6,15 +6,23 @@ import java.util.Iterator;
 import java.util.function.Consumer;
 
 class Node <E>{
-     protected E dato;
+     public E dato;
      protected Node next = null;
      protected Node prev = null;
 
      public Node(E dato) {
          this.dato = dato;
      }
- }
-public class lista implements List {
+
+    public E getDato() {
+        return dato;
+    }
+
+    public void setDato(E dato) {
+        this.dato = dato;
+    }
+}
+public class lista<T> implements List {
     WrongIndexException excepcionindice = new WrongIndexException();
     private int size=0;
     private Node primero = null;
@@ -32,6 +40,7 @@ public class lista implements List {
         if(pos>size){
             throw new WrongIndexException();
         } else if (pos==0) {
+            nuevo.next=primero;
             primero=nuevo;
             size++;
         }
