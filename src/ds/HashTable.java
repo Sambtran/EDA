@@ -1,14 +1,34 @@
 package ds;
 
 import adt.Dictionary;
+import adt.List;
+import exception.WrongIndexException;
 
+import java.security.Key;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
-public class HashTable implements Dictionary {
+public class HashTable<K,V> implements Dictionary {
     private static class TableEntry<K, V>{
-
+        K clave;
+        V valor;
+        TableEntry(K clave, V valor) {
+            this.clave = clave; this.valor = valor;
+        }
+        public boolean equals(Object obj) {
+            if (obj instanceof TableEntry<?,?> == false) return false;
+            TableEntry<K,V> ent = (TableEntry<K,V>)obj;
+            return ent.clave.equals(clave);
+        }
     }
+    private List<TableEntry<K,V>>[] tabla = null;
+    public HashTable(int m) throws WrongIndexException {
+        tabla = new List[m];
+        for (int i = 0; i < m; i++) tabla[i] = new lista(new TableEntry<K,V>(null,null)); {
+        };
+    }
+
     private class Citerator<K> implements Iterator<K>{
 
         /**
@@ -97,7 +117,8 @@ public class HashTable implements Dictionary {
      */
     @Override
     public Object put(Object key, Object value) {
-        return null;
+
+
     }
 
     /**
@@ -157,5 +178,8 @@ public class HashTable implements Dictionary {
     @Override
     public Iterator iterator() {
         return null;
+    }
+    private int hash(K clave) {
+        return clave.hashCode()%tabla.length;
     }
 }

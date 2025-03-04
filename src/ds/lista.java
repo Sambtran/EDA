@@ -18,6 +18,13 @@ public class lista implements List {
     WrongIndexException excepcionindice = new WrongIndexException();
     private int size=0;
     private Node primero = null;
+    public lista() throws WrongIndexException {
+        primero=null;
+    }
+    public lista(Object dato) throws WrongIndexException {
+        insert(0,dato);
+    }
+
     @Override
     public void insert(int pos, Object data) throws WrongIndexException {
         Node aux = primero;
