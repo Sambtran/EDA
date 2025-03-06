@@ -8,7 +8,9 @@ public class testhash {
             HashTable<String, Integer> table = new HashTable<>(10);
             table.put("Juan", 25);
             table.put("Maria", 30);
+            table.put("Maria", 45);
             table.put("Pedro", 28);
+
 
             System.out.println("Edad de Maria: " + table.get("Maria")); // 30
             System.out.println("Contiene 'Juan'? " + table.contains("Juan")); // true

@@ -36,6 +36,12 @@ public class HashTable<K, V> implements Dictionary<K, V> {
             tabla[i] = new lista<>();
         }
     }
+    public HashTable() throws WrongIndexException {
+        tabla = new lista[16];
+        for (int i = 0; i < 16; i++) {
+            tabla[i] = new lista<>();
+        }
+    }
 
     private int hash(K clave) {
         return Math.abs(clave.hashCode() % tabla.length);
