@@ -121,7 +121,7 @@ public class lista<T> implements List {
            */
           @Override
           public boolean hasNext() {
-              if(aux.next!=null){
+              if(aux!=null){
                   return true;
               }
               else
