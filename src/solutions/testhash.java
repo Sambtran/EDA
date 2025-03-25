@@ -2,6 +2,8 @@ package solutions;
 import ds.*;
 import exception.WrongIndexException;
 
+import java.util.Iterator;
+
 public class testhash {
 
         public static void main(String[] args) throws WrongIndexException {
@@ -19,6 +21,10 @@ public class testhash {
             System.out.println("Contiene 'Pedro'? " + table.contains("Pedro")); // false
 
             System.out.println("Tamaño de la tabla: " + table.size()); // 2
+            Iterator it = table.iterator();
+            while (it.hasNext()) {
+                System.out.println(it.next());
+            }
         }
 
 }
