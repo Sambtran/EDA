@@ -5,7 +5,7 @@ import exception.ElementoNoEncontrado;
 import exception.NoHayElementos;
 
 class NodoABB<E> {
-    E dato;
+    public E dato;
     NodoABB<E> izq, der;
     public NodoABB(E dato) {
         this.dato = dato;
@@ -14,10 +14,14 @@ class NodoABB<E> {
         this.izq = izq;
         this.der= der;
     }
+
+    public E getDato() {
+        return dato;
+    }
 }
 public class ABB<E extends Comparable<E>> {
 
-    NodoABB<E> raiz = null;
+    public NodoABB<E> raiz = null;
     public ABB() { }
     public NodoABB<E> buscar(E x) throws ElementoNoEncontrado {
         NodoABB<E> res = buscar(x, raiz);
