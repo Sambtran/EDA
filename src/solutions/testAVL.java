@@ -15,10 +15,10 @@ public class testAVL {
             System.out.println("Insertado: " + v);
         }
 
-        System.out.println("\nPostorden:");
-        for (int v : arbol) {
-            System.out.print(v + " ");
-        }
+ Iterator it = arbol.iterator();
+         while(it.hasNext()) {
+             System.out.println("Elemento: " + it.next());
+         }
 
         System.out.println("\n\nBuscando 25: " + (arbol.search(25) != null));
         System.out.println("Máximo: " + arbol.max());

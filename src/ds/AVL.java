@@ -10,7 +10,7 @@ class NodoAVL<E> {
 
     public NodoAVL(E dato) {
         this.dato = dato;
-        this.altura = 1;
+        this.altura = 0;
     }
 }
 
